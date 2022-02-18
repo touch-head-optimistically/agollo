@@ -21,6 +21,7 @@ import (
 	"container/list"
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/apolloconfig/agollo/v4/agcache"
 	"github.com/apolloconfig/agollo/v4/agcache/memory"
@@ -254,30 +255,32 @@ func (c *internalClient) GetBoolValue(key string, defaultValue bool) bool {
 
 //GetStringSliceValue 获取[]string 配置值
 func (c *internalClient) GetStringSliceValue(key string, defaultValue []string) []string {
-	value := c.getConfigValue(key)
+	value := c.GetValue(key)
 
-	if value == nil {
+	if value == utils.Empty {
 		return defaultValue
 	}
-	s, ok := value.([]string)
-	if !ok {
-		return defaultValue
-	}
-	return s
+
+	return strings.Split(value, ",")
 }
 
 //GetIntSliceValue 获取[]int 配置值
 func (c *internalClient) GetIntSliceValue(key string, defaultValue []int) []int {
-	value := c.getConfigValue(key)
+	value := c.GetValue(key)
 
-	if value == nil {
+	if value == utils.Empty {
 		return defaultValue
 	}
-	s, ok := value.([]int)
-	if !ok {
-		return defaultValue
+
+	var r []int
+	for _, s := range strings.Split(value, ",") {
+		it, err := strconv.Atoi(s)
+		if err != nil {
+			return defaultValue
+		}
+		r = append(r, it)
 	}
-	return s
+	return r
 }
 
 func (c *internalClient) getConfigValue(key string) interface{} {

@@ -55,10 +55,10 @@ func createMockApolloConfig(expireTime int) *internalClient {
 	//bool
 	configs["bool"] = "true"
 	//string slice
-	configs["stringSlice"] = []string{"1", "2"}
+	configs["stringSlice"] = "str1,str2"
 
 	//int slice
-	configs["intSlice"] = []int{1, 2}
+	configs["intSlice"] = "1,2"
 
 	client.cache.UpdateApolloConfigCache(configs, expireTime, storage.GetDefaultNamespace())
 
@@ -124,7 +124,7 @@ func TestGetIntSliceValue(t *testing.T) {
 
 func TestGetStringSliceValue(t *testing.T) {
 	client := createMockApolloConfig(120)
-	defaultValue := []string{"100"}
+	defaultValue := []string{"str1", "str2"}
 
 	//test default
 	v := client.GetStringSliceValue("joe", defaultValue)
@@ -134,12 +134,7 @@ func TestGetStringSliceValue(t *testing.T) {
 	//normal value
 	v = client.GetStringSliceValue("stringSlice", defaultValue)
 
-	Assert(t, []string{"1", "2"}, Equal(v))
-
-	//error type
-	v = client.GetStringSliceValue("float", defaultValue)
-
-	Assert(t, defaultValue, Equal(v))
+	Assert(t, []string{"str1", "str2"}, Equal(v))
 }
 
 func TestGetFloatValue(t *testing.T) {
